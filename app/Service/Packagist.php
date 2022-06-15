@@ -74,4 +74,15 @@ class Packagist
         }
         return $response;
     }
+
+    public function getPackage($packageName)
+    {
+        $url = config('packagist.api_url') . "p2/" . $packageName . ".json";
+        [$err,$response] = $this->httpRequest->request($url);
+        if ($err) {
+            std_logger()->error("packagist.api_url [{$url}] error :".$err->getMessage());
+            return false;
+        }
+        return $response;
+    }
 }

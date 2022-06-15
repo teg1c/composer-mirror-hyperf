@@ -18,7 +18,7 @@ use Hyperf\Utils\Coroutine;
 
 class SyncStatus
 {
-    public function status()
+    public function exec(): bool
     {
         std_logger()->info('start to sync status');
         while (true) {

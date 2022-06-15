@@ -11,9 +11,12 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Service\Sync\ComposerPhar;
-use App\Service\Sync\PackagesJsonFile;
-use App\Service\Sync\Provider;
+use App\Service\Sync\SyncComposerPhar;
+use App\Service\Sync\SyncDists;
+use App\Service\Sync\SyncPackagesJsonFile;
+use App\Service\Sync\SyncPackagesV1;
+use App\Service\Sync\SyncPackagesV2;
+use App\Service\Sync\SyncProvider;
 use App\Service\Sync\SyncStatus;
 use App\Service\Sync\SyncV2;
 
@@ -30,28 +33,52 @@ class Entry
         $co = [
             function () {
                 // Synchronize composer.phar
-                make(ComposerPhar::class)->syncComposerPhar();
+                make(SyncComposerPhar::class)->exec();
             },
             function () {
                 // Synchronize packages.json
-                make(PackagesJsonFile::class)->syncPackagesJsonFile();
+                make(SyncPackagesJsonFile::class)->exec();
             },
             function () {
                 // Synchronize Meta for V2
-                make(SyncV2::class)->v2();
+                make(SyncV2::class)->exec();
             },
             function () {
                 // Update status
-                make(SyncStatus::class)->status();
+                make(SyncStatus::class)->exec();
             },
         ];
         $syncProviderCo = [];
         for ($i = 0; $i < 10; ++$i) {
             $syncProviderCo[] = function () {
-                make(Provider::class)->syncProvider();
+                make(SyncProvider::class)->exec();
             };
         }
         $co = array_merge($co, $syncProviderCo);
+
+        $syncPackagesV1Co = [];
+        for ($i = 0; $i < 10; ++$i) {
+            $syncPackagesV1Co[] = function () {
+                make(SyncPackagesV1::class)->exec();
+            };
+        }
+        $co = array_merge($co, $syncPackagesV1Co);
+
+        $syncPackagesV2Co = [];
+        for ($i = 0; $i < 10; ++$i) {
+            $syncPackagesV2Co[] = function () {
+                make(SyncPackagesV2::class)->exec();
+            };
+        }
+        $co = array_merge($co, $syncPackagesV2Co);
+
+        $syncPackagesV2Co = [];
+        for ($i = 0; $i < 30; ++$i) {
+            $syncPackagesV2Co[] = function () {
+                make(SyncDists::class)->exec();
+            };
+        }
+        $co = array_merge($co, $syncPackagesV2Co);
         parallel($co);
     }
 

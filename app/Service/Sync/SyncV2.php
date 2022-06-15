@@ -25,7 +25,7 @@ class SyncV2
         $this->httpRequest = $httpRequest;
     }
 
-    public function v2()
+    public function exec()
     {
         std_logger()->info('init sync v2');
         while (true) {
@@ -34,27 +34,27 @@ class SyncV2
         }
     }
 
-    private function sync()
+    private function sync(): void
     {
         $lastTimestamp = redis()->get(Code::v2LastUpdateTimeKey);
         if (empty($lastTimestamp)) {
             $lastTimestamp = make(Packagist::class)->getInitTimestamp();
             if ($lastTimestamp === false) {
-                return false;
+                return;
             }
             $syncAll = $this->syncAll();
             if ($syncAll == false) {
-                return false;
+                return;
             }
         }
         $changes = make(Packagist::class)->getMetadataChanges($lastTimestamp);
         if (empty($changes)) {
-            return false;
+            return;
         }
         // Dispatch changes
         if ($changes['timestamp'] == $lastTimestamp || empty($changes['actions'])) {
             // No changes
-            return true;
+            return;
         }
         foreach ($changes['actions'] as $item) {
             $packageName = $item['package'];
@@ -66,10 +66,9 @@ class SyncV2
             }
         }
         redis()->set(Code::v2LastUpdateTimeKey,$changes['timestamp']);
-        return true;
     }
 
-    private function syncAll()
+    private function syncAll(): bool
     {
         $content = make(Packagist::class)->getAllPackages();
         if (empty($content)) {

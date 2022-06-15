@@ -17,9 +17,9 @@ use App\Service\Packagist;
 use Carbon\Carbon;
 use Hyperf\Utils\Coroutine;
 
-class Provider
+class SyncProvider
 {
-    public function syncProvider()
+    public function exec()
     {
         while (true) {
             $jobJson = redis()->SPop(Code::providerQueue);
@@ -44,7 +44,7 @@ class Provider
         }
         $content = make(Packagist::class)->get($providerArr['Path']);
         if (empty($content)) {
-            std_logger()->error('get Provider Path error :' . $providerArr['Path']);
+            std_logger()->error('get SyncProvider Path error :' . $providerArr['Path']);
             return false;
         }
         $hash = hash('sha256', $content);

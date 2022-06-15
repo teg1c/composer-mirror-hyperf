@@ -17,9 +17,9 @@ use App\Service\Packagist;
 use Carbon\Carbon;
 use Hyperf\Utils\Coroutine;
 
-class PackagesJsonFile
+class SyncPackagesJsonFile
 {
-    public function syncPackagesJsonFile()
+    public function exec()
     {
         while (true) {
             $this->sync();
@@ -100,7 +100,7 @@ class PackagesJsonFile
             'Content-Type' => 'application/json',
         ]);
         if ($oss === false) {
-            std_logger()->error('save packages.json on OSS done');
+            std_logger()->error('save packages.json on OSS failed');
             return false;
         }
         redis()->set(Code::packagesJsonKey, $hash);

@@ -16,7 +16,7 @@ use App\Service\Code;
 use App\Service\HttpRequest;
 use Hyperf\Utils\Coroutine;
 
-class ComposerPhar
+class SyncComposerPhar
 {
     public HttpRequest $httpRequest;
 
@@ -25,7 +25,7 @@ class ComposerPhar
         $this->httpRequest = $httpRequest;
     }
 
-    public function syncComposerPhar()
+    public function exec()
     {
         std_logger()->info('init sync composer.phar');
         while (true) {

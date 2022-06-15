@@ -33,6 +33,27 @@ class AliyunOss
         }
         return $path;
     }
+    public function delete($path)
+    {
+        try {
+            $this->factory->get(config('file.default'))->delete($path);
+        } catch (\Throwable $e) {
+            std_logger()->error(sprintf("delete file to OSS failed: %s",$e->getMessage()));
+            return false;
+        }
+        return $path;
+    }
+
+    public function isObjectExist($path)
+    {
+        try {
+            $bool = $this->factory->get(config('file.default'))->has($path);
+        } catch (\Throwable $e) {
+            std_logger()->error(sprintf("isObjectExist  OSS failed: %s",$e->getMessage()));
+            return false;
+        }
+        return $bool;
+    }
     public function test()
     {
         return $this->factory->get(config('file.default'))->listContents('/');
