@@ -33,14 +33,14 @@ class SyncDists
         }
     }
 
-    public function uploadDist($job)
+    private function uploadDist($job)
     {
         if (empty($job)) {
             return;
         }
         // Get information
-        $path = $job['path'];
-        $url = $job['url'];
+        $path = $job['Path'];
+        $url = $job['Url'];
         if (empty($url)) {
             std_logger()->error(sprintf('url is invalid  %s', json_encode($job)));
             return;
@@ -66,12 +66,5 @@ class SyncDists
             return;
         }
         // TODO warm cdn url
-    }
-
-    private function SyncDistsRetry($job)
-    {
-        if (empty($job)) {
-            return;
-        }
     }
 }

@@ -36,6 +36,7 @@ class SyncPackagesV1
 
     private function syncPackage($job)
     {
+        std_logger()->info(sprintf("start sync package v1 %s",$job['Path']));
         if (empty($job)) {
             return false;
         }
@@ -46,7 +47,7 @@ class SyncPackagesV1
             std_logger()->error('Wrong Hash, Original: ' . $job['Hash'] . ' Current: ' . $hash);
             return false;
         }
-        $oss = make(AliyunOss::class)->write($job['Path'], json_encode($job, JSON_UNESCAPED_UNICODE), [
+        $oss = make(AliyunOss::class)->write($job['Path'], $content, [
             'Content-Type' => 'application/json',
         ]);
         if ($oss === false) {
@@ -58,7 +59,7 @@ class SyncPackagesV1
         if (! empty($response['packages'])) {
             foreach ($response['packages'] as $packageName => $versions) {
                 foreach ($versions as $versionName => $packageVersion) {
-                    $distName = $packageName + '/' + $versionName;
+                    $distName = $packageName . '/' . $versionName;
                     $dist = $packageVersion['dist'];
                     $path = 'dists/' . $packageName . '/' . $dist['reference'] . '.' . $dist['type'];
 
@@ -78,7 +79,7 @@ class SyncPackagesV1
         }
         //TODO Warm cdn url
         $getTodayKey = Code::packageV1SetHash . '-' . date('Y-m-d');
-        redis()->sAdd($getTodayKey, $job['path']);
+        redis()->sAdd($getTodayKey, $job['Path']);
         redis()->expireAt($getTodayKey, Carbon::tomorrow()->timestamp);
         return true;
     }

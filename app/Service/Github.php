@@ -26,11 +26,13 @@ class Github
             'Authorization' => sprintf('token %s', config('packagist.github_token')),
         ]);
         if ($err) {
-            std_logger()->error("get github dist faild:".$err->getMessage());
+            std_logger()->error("get github dist faild [{$url}] error:" . $err->getMessage());
             return false;
         }
+        std_logger()->info("get github dist success [{$url}]");
         return $response;
     }
+
     public function test(): void
     {
         $url = 'https://api.github.com/zen';
