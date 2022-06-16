@@ -27,9 +27,13 @@ class SyncPackagesV2
                 Coroutine::sleep(1);
                 continue;
             }
-            $job = json_decode($jobJson, true);
 
-            $this->syncPackage($job);
+            try {
+                $job = json_decode($jobJson, true);
+                $this->syncPackage($job);
+            } catch (\Throwable $e) {
+                logger()->error("SyncPackagesV2 error:".format_throwable($e));
+            }
         }
     }
 

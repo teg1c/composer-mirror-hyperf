@@ -32,7 +32,7 @@ class SyncProvider
             try {
                 $this->sync($providerArr);
             } catch (\Throwable $e) {
-                var_dump('syncProvider error',$providerArr);
+                var_dump('syncProvider error', $providerArr);
             }
         }
     }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2ccdf1df83289f9acb83e95dfe80250",
+    "content-hash": "18370b0e9a983b2953f3cf91bf4e522f",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -4681,6 +4681,48 @@
                 }
             ],
             "time": "2022-01-02T09:55:41+00:00"
+        },
+        {
+            "name": "tegic/http",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/teg1c/http.git",
+                "reference": "6e8e254aa60ed7929da989c8566f07d577e7aff0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/teg1c/http/zipball/6e8e254aa60ed7929da989c8566f07d577e7aff0",
+                "reference": "6e8e254aa60ed7929da989c8566f07d577e7aff0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "tegic\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "tegic",
+                    "email": "35350826@qq.com"
+                }
+            ],
+            "description": "http",
+            "support": {
+                "issues": "https://github.com/teg1c/http/issues",
+                "source": "https://github.com/teg1c/http/tree/v2.0.1"
+            },
+            "time": "2022-06-15T08:59:53+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

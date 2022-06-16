@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use Hyperf\Filesystem\FilesystemFactory;
-use League\Flysystem\FileExistsException;
 
 class AliyunOss
 {
@@ -23,22 +22,23 @@ class AliyunOss
         $this->factory = $factory;
     }
 
-    public function write($path,$content,$config = [])
+    public function write($path, $content, $config = [])
     {
         try {
-            $this->factory->get(config('file.default'))->write($path, $content,$config);
+            $this->factory->get(config('file.default'))->write($path, $content, $config);
         } catch (\Throwable $e) {
-            std_logger()->error(sprintf("put file to OSS failed: %s",$e->getMessage()));
+            std_logger()->error(sprintf('put file to OSS failed: %s', $e->getMessage()));
             return false;
         }
         return $path;
     }
+
     public function delete($path)
     {
         try {
             $this->factory->get(config('file.default'))->delete($path);
         } catch (\Throwable $e) {
-            std_logger()->error(sprintf("delete file to OSS failed: %s",$e->getMessage()));
+            std_logger()->error(sprintf('delete file to OSS failed: %s', $e->getMessage()));
             return false;
         }
         return $path;
@@ -49,11 +49,12 @@ class AliyunOss
         try {
             $bool = $this->factory->get(config('file.default'))->has($path);
         } catch (\Throwable $e) {
-            std_logger()->error(sprintf("isObjectExist  OSS failed: %s",$e->getMessage()));
+            std_logger()->error(sprintf('isObjectExist  OSS failed: %s', $e->getMessage()));
             return false;
         }
         return $bool;
     }
+
     public function test()
     {
         return $this->factory->get(config('file.default'))->listContents('/');

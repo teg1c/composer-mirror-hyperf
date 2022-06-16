@@ -27,8 +27,9 @@ class SyncV2
 
     public function exec()
     {
-        std_logger()->info('init sync v2');
+        std_logger()->info('init SyncV2');
         while (true) {
+            std_logger()->info('SyncV2  sleep 5 second');
             $this->sync();
             Coroutine::sleep(5);
         }
@@ -49,6 +50,7 @@ class SyncV2
         }
         $changes = make(Packagist::class)->getMetadataChanges($lastTimestamp);
         if (empty($changes)) {
+            std_logger()->error("get getMetadataChanges false");
             return;
         }
         // Dispatch changes
@@ -72,18 +74,19 @@ class SyncV2
     {
         $content = make(Packagist::class)->getAllPackages();
         if (empty($content)) {
+            std_logger()->error("get all packages failed: null");
             return false;
         }
         foreach ($content['packageNames'] as $packageName) {
             redis()->sAdd(Code::packageV2Queue, json_encode([
-                'Type' => 'update',
-                'Package' => $packageName,
-                'Time' => 0,
+                'type' => 'update',
+                'package' => $packageName,
+                'time' => 0,
             ]), JSON_UNESCAPED_UNICODE);
             redis()->sAdd(Code::packageV2Queue, json_encode([
-                'Type' => 'update',
-                'Package' => $packageName . '~dev',
-                'Time' => 0,
+                'type' => 'update',
+                'package' => $packageName . '~dev',
+                'time' => 0,
             ]), JSON_UNESCAPED_UNICODE);
         }
         return true;

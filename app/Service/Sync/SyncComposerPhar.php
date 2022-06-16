@@ -29,7 +29,11 @@ class SyncComposerPhar
     {
         std_logger()->info('init sync composer.phar');
         while (true) {
-            $this->sync();
+            try {
+                $this->sync();
+            } catch (\Throwable $e) {
+                logger()->error("init sync composer.phar error:".format_throwable($e));
+            }
             Coroutine::sleep(6000);
         }
     }

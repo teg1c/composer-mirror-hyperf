@@ -25,6 +25,7 @@ class Github
         [$err,$response] = $this->httpRequest->request($url, [], [
             'Authorization' => sprintf('token %s', config('packagist.github_token')),
         ]);
+
         if ($err) {
             std_logger()->error("get github dist faild [{$url}] error:" . $err->getMessage());
             return false;

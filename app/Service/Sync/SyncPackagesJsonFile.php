@@ -22,7 +22,11 @@ class SyncPackagesJsonFile
     public function exec()
     {
         while (true) {
-            $this->sync();
+            try {
+                $this->sync();
+            } catch (\Throwable $e) {
+                logger()->error("SyncPackagesJsonFile error:".format_throwable($e));
+            }
             Coroutine::sleep(60);
         }
     }

@@ -28,6 +28,7 @@
         "hyperf/process": "3.0.*",
         "hyperf/redis": "3.0.*",
         "shahradelahi/easy-http": "^1.1",
+        "tegic/http": "^2.0",
         "xxtime/flysystem-aliyun-oss": "^1.5"
     },
     "require-dev": {

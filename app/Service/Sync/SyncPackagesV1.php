@@ -28,9 +28,13 @@ class SyncPackagesV1
                 Coroutine::sleep(1);
                 continue;
             }
-            $job = json_decode($jobJson, true);
 
-            $this->syncPackage($job);
+            try {
+                $job = json_decode($jobJson, true);
+                $this->syncPackage($job);
+            } catch (\Throwable $e) {
+                logger()->error("sync package v1 error:".format_throwable($e));
+            }
         }
     }
 
@@ -42,6 +46,9 @@ class SyncPackagesV1
         }
         $content = make(Packagist::class)->get($job['Path']);
 
+        if (empty($content)){
+            return false;
+        }
         $hash = hash('sha256', $content);
         if ($hash != $job['Hash']) {
             std_logger()->error('Wrong Hash, Original: ' . $job['Hash'] . ' Current: ' . $hash);
@@ -59,24 +66,31 @@ class SyncPackagesV1
         if (! empty($response['packages'])) {
             foreach ($response['packages'] as $packageName => $versions) {
                 foreach ($versions as $versionName => $packageVersion) {
-                    $distName = $packageName . '/' . $versionName;
-                    $dist = $packageVersion['dist'];
-                    $path = 'dists/' . $packageName . '/' . $dist['reference'] . '.' . $dist['type'];
-
-                    $exist = redis()->sIsMember(Code::distSet, $path);
-                    if (empty($exist)) {
-                        redis()->sAdd(Code::distQueue, json_encode([
-                            'Path' => $path,
-                            'Url' => $dist['url'],
-                        ]));
-                        redis()->sAdd(Code::versionsSet, $distName);
-                        $getTodayKey = Code::versionsSet . '-' . date('Y-m-d');
-                        redis()->sAdd($getTodayKey, $distName);
-                        redis()->expireAt($getTodayKey, Carbon::tomorrow()->timestamp);
+                    try {
+                        $distName = $packageName . '/' . $versionName;
+                        $dist = $packageVersion['dist'];
+                        if (empty($dist)){
+                            continue;
+                        }
+                        $path = 'dists/' . $packageName . '/' . $dist['reference'] . '.' . $dist['type'];
+                        $exist = redis()->sIsMember(Code::distSet, $path);
+                        if (empty($exist)) {
+                            redis()->sAdd(Code::distQueue, json_encode([
+                                'Path' => $path,
+                                'Url' => $dist['url'],
+                            ]));
+                            redis()->sAdd(Code::versionsSet, $distName);
+                            $getTodayKey = Code::versionsSet . '-' . date('Y-m-d');
+                            redis()->sAdd($getTodayKey, $distName);
+                            redis()->expireAt($getTodayKey, Carbon::tomorrow()->timestamp);
+                        }
+                    } catch (\Throwable $e) {
+                        logger()->error('========error',$packageVersion);
                     }
                 }
             }
         }
+        std_logger()->info("[✓] sync package v1 success ". Code::packageP1Queue." count:".count($response['packages']));
         //TODO Warm cdn url
         $getTodayKey = Code::packageV1SetHash . '-' . date('Y-m-d');
         redis()->sAdd($getTodayKey, $job['Path']);

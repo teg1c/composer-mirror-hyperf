@@ -43,10 +43,10 @@ class Entry
                 // Synchronize Meta for V2
                 make(SyncV2::class)->exec();
             },
-            function () {
-                // Update status
-                make(SyncStatus::class)->exec();
-            },
+//            function () {
+//                // Update status
+//                make(SyncStatus::class)->exec();
+//            },
         ];
         $syncProviderCo = [];
         for ($i = 0; $i < 10; ++$i) {
@@ -71,9 +71,8 @@ class Entry
             };
         }
         $co = array_merge($co, $syncPackagesV2Co);
-
         $syncPackagesV2Co = [];
-        for ($i = 0; $i < 30; ++$i) {
+        for ($i = 0; $i < 1; ++$i) {
             $syncPackagesV2Co[] = function () {
                 make(SyncDists::class)->exec();
             };

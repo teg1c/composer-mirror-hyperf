@@ -22,14 +22,20 @@ class SyncDists
     public function exec()
     {
         while (true) {
-            $jobJson = redis()->sPop(Code::distQueue);
-            if (empty($jobJson)) {
-                std_logger()->info('get no task from ' . Code::distQueue . ', sleep 1 second');
+            try {
+                $jobJson = redis()->sPop(Code::distQueue);
+                if (empty($jobJson)) {
+                    std_logger()->info('get no task from ' . Code::distQueue . ', sleep 1 second');
+                    Coroutine::sleep(1);
+                    continue;
+                }
+
+                $job = json_decode($jobJson, true);
+                $this->uploadDist($job);
                 Coroutine::sleep(1);
-                continue;
+            } catch (\Throwable $e) {
+                logger()->error('SyncDists error:' . format_throwable($e));
             }
-            $job = json_decode($jobJson, true);
-            $this->uploadDist($job);
         }
     }
 
@@ -45,11 +51,13 @@ class SyncDists
             std_logger()->error(sprintf('url is invalid  %s', json_encode($job)));
             return;
         }
+
         $getTodayKey = Code::distSet . '-' . date('Y-m-d');
         redis()->sAdd($getTodayKey, $path);
         redis()->expireAt($getTodayKey, Carbon::tomorrow()->timestamp);
 
         $isExist = make(AliyunOss::class)->isObjectExist($path);
+
         if ($isExist) {
             std_logger()->error(sprintf('object(%s) exists', $path));
             return;
